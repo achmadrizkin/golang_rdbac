@@ -28,3 +28,8 @@ func (u *userUseCase) AssignRoleToUser(userId string, roleID string) error {
 func (u *userUseCase) CheckUserPermission(userID string, permissionName string) (bool, error) {
 	return u.userRepo.CheckUserPermission(userID, permissionName)
 }
+
+// LoginUser implements domain.UserUseCase.
+func (u *userUseCase) LoginUser(user model.User) (model.User, error) {
+	return u.userRepo.LoginUser(user)
+}

@@ -35,9 +35,15 @@ func main() {
 	// Define routes
 	router.POST("/roles", roleController.CreateRole)
 	router.POST("/permissions", permissionController.CreatePermission)
+
 	router.POST("/users", userController.CreateUser)
+	router.POST("/users/login", userController.LoginUser)
+
 	router.GET("/users/:userID/roles/:roleID", userController.AssignRoleToUser)
 	router.GET("/roles/:roleID/permissions/:permissionID", roleController.AssignPermissionToRole)
 	router.GET("/users/:userID/permissions/:permissionName", userController.CheckUserPermission)
+
+	router.GET("/users/temp", userController.GetUserTemp)
+
 	router.Run(":9091")
 }

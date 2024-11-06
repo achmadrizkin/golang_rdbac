@@ -1,8 +1,11 @@
 package repo
 
 import (
+	"errors"
+	"fmt"
 	"go-multirole/domain"
 	"go-multirole/model"
+	"go-multirole/utils"
 
 	"gorm.io/gorm"
 )
@@ -19,10 +22,29 @@ func NewUserRepository(db *gorm.DB) domain.UserRepo {
 
 // CreateUser implements domain.UserRepo.
 func (d *userRepository) CreateUser(user model.User) (model.User, error) {
+	user.Password, _ = utils.HashPassword(user.Password)
 	if err := d.db.Create(&user).Error; err != nil {
 		return user, err
 	}
 	return user, nil
+}
+
+// LoginUser checks credentials and returns the authenticated user with roles.
+func (d *userRepository) LoginUser(inputUser model.User) (model.User, error) {
+	var dbUser model.User
+
+	if err := d.db.Where("username = ?", inputUser.Username).First(&dbUser).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return model.User{}, errors.New("user not found")
+		}
+		return model.User{}, fmt.Errorf("database error: %w", err)
+	}
+
+	if !utils.VerifyPassword(dbUser.Password, inputUser.Password) {
+		return model.User{}, errors.New("incorrect password")
+	}
+
+	return dbUser, nil
 }
 
 // AssignRoleToUser implements domain.UserRepo.
