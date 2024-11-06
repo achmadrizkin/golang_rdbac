@@ -25,11 +25,18 @@ func (d *RoleController) CreateRole(c *gin.Context) {
 
 	roleResponse, err := d.roleUseCase.CreateRole(role)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create role: " + err.Error()})
+		c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to create role: " + err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, roleResponse)
+	c.JSON(http.StatusCreated, model.Response{
+		StatusCode: http.StatusCreated,
+		Message:    "Created role success",
+		Data:       roleResponse,
+	})
 }
 
 func (d *RoleController) AssignPermissionToRole(c *gin.Context) {
@@ -38,9 +45,15 @@ func (d *RoleController) AssignPermissionToRole(c *gin.Context) {
 
 	err := d.roleUseCase.AssignPermissionToRole(roleID, permissionID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create role: " + err.Error()})
+		c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to create role: " + err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Permission assigned to role"})
+	c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Permission assigned to role",
+	})
 }

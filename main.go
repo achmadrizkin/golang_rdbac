@@ -4,6 +4,7 @@ import (
 	"go-multirole/config"
 	"go-multirole/controller"
 	"go-multirole/db"
+	"go-multirole/middleware"
 	"go-multirole/repo"
 	"go-multirole/usecase"
 	"log"
@@ -43,7 +44,7 @@ func main() {
 	router.GET("/roles/:roleID/permissions/:permissionID", roleController.AssignPermissionToRole)
 	router.GET("/users/:userID/permissions/:permissionName", userController.CheckUserPermission)
 
-	router.GET("/users/temp", userController.GetUserTemp)
+	router.GET("/users/temp", middleware.Middleware(), userController.GetUserTemp)
 
 	router.Run(":9091")
 }

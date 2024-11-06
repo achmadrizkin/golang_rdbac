@@ -40,10 +40,6 @@ func (d *userRepository) LoginUser(inputUser model.User) (model.User, error) {
 		return model.User{}, fmt.Errorf("database error: %w", err)
 	}
 
-	if !utils.VerifyPassword(dbUser.Password, inputUser.Password) {
-		return model.User{}, errors.New("incorrect password")
-	}
-
 	return dbUser, nil
 }
 
@@ -68,12 +64,12 @@ func (d *userRepository) AssignRoleToUser(userId string, roleID string) error {
 // CheckUserPermission implements domain.UserRepo.
 func (d *userRepository) CheckUserPermission(userID string, permissionName string) (bool, error) {
 	var user model.User
-	hasPermission := false
 
 	if err := d.db.Preload("Roles.Permissions").First(&user, userID).Error; err != nil {
 		return false, err
 	}
 
+	hasPermission := false
 	for _, role := range user.Roles {
 		for _, perm := range role.Permissions {
 			if perm.Name == permissionName {

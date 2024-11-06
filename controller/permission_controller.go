@@ -25,9 +25,16 @@ func (d *PermissionController) CreatePermission(c *gin.Context) {
 
 	permissionResponse, err := d.permissionUseCase.CreatePermission(permission)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create permission: " + err.Error()})
+		c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    "Unable to create permission: " + err.Error(),
+		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, permissionResponse)
+	c.JSON(http.StatusCreated, model.Response{
+		StatusCode: http.StatusCreated,
+		Message:    "Created permission success",
+		Data:       permissionResponse,
+	})
 }

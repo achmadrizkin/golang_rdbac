@@ -1,8 +1,11 @@
 package usecase
 
 import (
+	"errors"
+	"go-multirole/config"
 	"go-multirole/domain"
 	"go-multirole/model"
+	"go-multirole/utils"
 )
 
 type userUseCase struct {
@@ -30,6 +33,25 @@ func (u *userUseCase) CheckUserPermission(userID string, permissionName string) 
 }
 
 // LoginUser implements domain.UserUseCase.
-func (u *userUseCase) LoginUser(user model.User) (model.User, error) {
-	return u.userRepo.LoginUser(user)
+func (u *userUseCase) LoginUser(user model.User) (string, error) {
+	dbUser, err := u.userRepo.LoginUser(user)
+	if err != nil {
+		return "", err
+	}
+
+	if !utils.VerifyPassword(dbUser.Password, user.Password) {
+		return "", errors.New("incorrect password")
+	}
+
+	config, err := config.LoadConfig(".")
+	if err != nil {
+		return "", nil
+	}
+
+	token, err := utils.GenerateToken(config.TokenExpiresIn, dbUser.ID, config.TokenSecret)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
